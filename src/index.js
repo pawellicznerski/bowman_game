@@ -8,8 +8,8 @@ class Bow{
 }
 
 class Arrow{
-  constructor(left){
-    this.left=left;
+  constructor(top){
+    this.top=top;
     this.canShoot=false;
   }
 }
@@ -21,8 +21,9 @@ class Game{
 }
 
 class ShootingTarget{
-  constructor(){
+  constructor(left){
     this.direction=1;
+    this.left=left
   }
 }
 
@@ -33,10 +34,10 @@ class Button{
   }
 }
 
-const aroowLeftPos = 85;
+const aroowLeftPos = 0;
 
 const gameObj = new Game(0);
-const shootingTargetObj = new ShootingTarget();
+const shootingTargetObj = new ShootingTarget(1);
 const bowObj = new Bow();
 const arrowObj = new Arrow(aroowLeftPos);
 const buttonObj = new Button();
@@ -70,7 +71,7 @@ function component() {
   //arrow
   const arrowDOM = document.createElement('div');
   arrowDOM.classList.add('arrow');
-  arrowDOM.setAttribute("style",`top:14px;left:${arrowObj.left}px`)
+  arrowDOM.setAttribute("style",`top:${arrowObj.top}px;left:49px`)
   bowDOM.appendChild(arrowDOM);
 
   return gameContainerDOM;
@@ -99,54 +100,62 @@ function startPlaying(){
     gameOverTextParent.removeChild(gameOverText[0]);
   };
   initiateMovingTarget();
-  addEventListenerToDoc();
+  addEventListenerToDoc(true);
 
 }
 
 function initiateMovingTarget(){
-  let currentPosition=1;
-  const id = setInterval(movingTarget,10,currentPosition)
+  const id = setInterval(movingTarget,10)
 
   function movingTarget(){
     const target = document.getElementsByClassName('shooting-target');
-    target[0].setAttribute("style",`top:0px;left:${currentPosition}px`);
-    if(currentPosition>=window.innerWidth-120||currentPosition<=0){
+    target[0].setAttribute("style",`top:0px;left:${shootingTargetObj.left}px`);
+    if(shootingTargetObj.left>=window.innerWidth-120||shootingTargetObj.left<=0){
       shootingTargetObj.direction=shootingTargetObj.direction*(-1);
     }
-    currentPosition=currentPosition+shootingTargetObj.direction;
+    shootingTargetObj.left=shootingTargetObj.left+shootingTargetObj.direction;
   }
 }
 
-function addEventListenerToDoc(){
-  arrowObj.canShoot=true;
-  setTimeout(function(){
+function addEventListenerToDoc(val){
+  if(val){
+    arrowObj.canShoot=true;
+    setTimeout(function(){
+      ['click','keypress'].forEach( evt =>
+      document.body.addEventListener(evt, moveArrow)
+      );
+    }, 10);
+  }else{
     ['click','keypress'].forEach( evt =>
-    document.body.addEventListener(evt, moveArrow)
-    );
-  }, 10);
-
+    document.body.removeEventListener(evt, moveArrow)
+    );  }
 }
 
 function moveArrow(e){
+  const arrowDOM = document.getElementsByClassName('arrow');
+console.log(arrowDOM);
   console.log(e);
   if(!arrowObj.canShoot) return null;
   if(e.type==="click"||e.charCode===32||e.charCode===102){
-    // let currentArrowPosition = arrowObj.left;
-    console.log("dupa");
     const id = setInterval(movingArrowFn,4);
     const arrowDOM = document.getElementsByClassName('arrow');
     arrowObj.canShoot=false;
 
     function movingArrowFn(){
-      if(arrowObj.left==600){
+      if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top==55){
         clearInterval(id);
-        // ['click','keypress'].forEach( evt =>
-        // document.body.removeEventListener(evt, moveArrow)
-        // );
+        console.log(arrowDOM);
+        if(window.innerWidth/2-110 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2+10){
+          updateData();
+        }
       }
-      arrowDOM[0].setAttribute("style",`top:14px;left:${arrowObj.left}px`)
-      arrowObj.left=arrowObj.left+1;
-      console.log('arrowObj.left',arrowObj.left);
+      arrowDOM[0].setAttribute("style",`top:${arrowObj.top}px;left:49px`)
+      arrowObj.top=arrowObj.top-1;
+      console.log('window.innerWidth/2-110',window.innerWidth/2-110);
+      console.log('window.innerWidth/2+10',window.innerWidth/2+10);
+
+      console.log('shootingTargetObj.left',shootingTargetObj.left);
+
     }
     console.log("dupa");
   }else{
