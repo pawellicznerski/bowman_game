@@ -47,6 +47,7 @@ body{
 .bow:before {
   content: "";
   position: absolute;
+  z-index: 2;
   width: 120px;
   height:100px;
   top:20px;

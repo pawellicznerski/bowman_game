@@ -56,7 +56,7 @@ function component() {
   //score table
   const scoreTextDOM = document.createElement('div');
   scoreTextDOM.classList.add('scoreText');
-  scoreTextDOM.innerHTML='Score: '+0;
+  scoreTextDOM.innerHTML='Score: '+gameObj.scoreText;
   gameContainerDOM.appendChild(scoreTextDOM);
   //shooting target
   const shootingTargetDOM = document.createElement('div');
@@ -143,25 +143,70 @@ console.log(arrowDOM);
 
     function movingArrowFn(){
       if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top==55){
-        clearInterval(id);
-        console.log(arrowDOM);
         if(window.innerWidth/2-110 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2+10){
-          updateData();
+          clearInterval(id);
+          // console.log(arrowDOM);
+          updateData(arrowDOM);
         }
       }
       arrowDOM[0].setAttribute("style",`top:${arrowObj.top}px;left:49px`)
       arrowObj.top=arrowObj.top-1;
-      console.log('window.innerWidth/2-110',window.innerWidth/2-110);
-      console.log('window.innerWidth/2+10',window.innerWidth/2+10);
-
-      console.log('shootingTargetObj.left',shootingTargetObj.left);
-
     }
-    console.log("dupa");
   }else{
-    console.log("prawdziwa dupa");
     return null;
   }
+
+}
+
+function updateData(arrowDOM){
+  // console.log('arrowDOM',arrowDOM);
+  // console.log('shootingTargetObj.left',shootingTargetObj.left);
+  const bowerLeft =arrowDOM[0].offsetParent.offsetLeft+49;
+  // console.log('bowerLeft',bowerLeft);
+  const placeOnShootingTarget = shootingTargetObj.left-bowerLeft;
+  // console.log('placeOnShootingTarget',placeOnShootingTarget);
+  const ringWidth = 120/9;
+  // console.log("ringWidth",ringWidth);
+  const lowestPoint = 104-bowerLeft;
+  // console.log("lowestPoint",lowestPoint);
+
+
+  if(placeOnShootingTarget<lowestPoint+ringWidth){
+    gameObj.scoreText= gameObj.scoreText+1;
+    console.log("1111111111");
+  } else if (placeOnShootingTarget<lowestPoint+2*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+3;
+    console.log("2222222222222");
+  } else if (placeOnShootingTarget<lowestPoint+3*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+6;
+    console.log("333333333333");
+  } else if (placeOnShootingTarget<lowestPoint+4*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+8;
+    console.log("444444444444");
+  } else if (placeOnShootingTarget<lowestPoint+5*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+10;
+    console.log("5555555555555");
+  } else if (placeOnShootingTarget<lowestPoint+4*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+8;
+    console.log("44444444444444");
+  } else if (placeOnShootingTarget<lowestPoint+3*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+6;
+    console.log("33333333333333");
+  } else if (placeOnShootingTarget<lowestPoint+2*ringWidth) {
+    gameObj.scoreText= gameObj.scoreText+3;
+    console.log("2222222222222");
+  } else {
+    gameObj.scoreText= gameObj.scoreText+1;
+    console.log("111111111111");
+  }
+  console.log("game",gameObj.scoreText);
+
+  // const gameContainerDOM = document.getElementsByClassName('container');
+
+  const scoreTextDOM = document.getElementsByClassName('scoreText');
+  scoreTextDOM.innerHTML='Score: '+gameObj.scoreText;
+  // gameContainerDOM.appendChild(scoreTextDOM);
+
 
 }
 
