@@ -14,7 +14,7 @@ class Game{
 
 class ShootingTarget{
   constructor(){
-
+    this.direction=1;
   }
 }
 
@@ -69,15 +69,22 @@ function startPlaying(){
     const gameOverTextParent = gameOverText[0].parentNode;
     gameOverTextParent.removeChild(gameOverText[0]);
   };
+  let currentPosition=1;
+  const id = setInterval(movingTarget,10,currentPosition)
 
-  const id = setInterval(movingTarget,10)
+  function movingTarget(){
 
+    const target = document.getElementsByClassName('shooting-target');
+    target[0].setAttribute("style",`top:0px;left:${currentPosition}px`);
+    if(currentPosition>=window.innerWidth-120||currentPosition<=0){
+      shootingTarget.direction=shootingTarget.direction*(-1);
+    }
+    currentPosition=currentPosition+shootingTarget.direction;
+    console.log("currentPosition",currentPosition);
+    console.log("shootingTarget.direction",shootingTarget.direction);
+  }
 }
 
-function movingTarget(){
-  const shootingTarget = document.getElementsByClassName('shooting-target');
-  shootingTarget.setAttribute("style",`left:${currentPosition}px`)
-}
 
 
 document.body.appendChild(component());
