@@ -35,11 +35,15 @@ class Button{
 }
 
 const aroowLeftPos = 0;
+const arrowInBoardLeftPos = 0;
 
 const gameObj = new Game(0);
-const shootingTargetObj = new ShootingTarget(1);
+const shootingTargetObj = new ShootingTarget(window.innerWidth/2-100);
+console.log(window.innerWidth/2-60);
 const bowObj = new Bow();
 const arrowObj = new Arrow(aroowLeftPos);
+const arrowInBoardObj = new Arrow(arrowInBoardLeftPos);
+arrowInBoardObj.left=0;
 const buttonObj = new Button();
 
 function component() {
@@ -50,7 +54,7 @@ function component() {
   const buttonDOM = document.createElement('button');
   buttonDOM.classList.add('main_button');
   buttonDOM.innerHTML='PLAY A NEW GAME';
-  buttonDOM.setAttribute("style",`top:${buttonObj.top}px;left:${buttonObj.left}px`)
+  buttonDOM.setAttribute("style",`top:${buttonObj.top}px;left:${buttonObj.left}px`);
   buttonDOM.addEventListener('click',startPlaying);
   gameContainerDOM.appendChild(buttonDOM);
   //score table
@@ -70,9 +74,14 @@ function component() {
   gameContainerDOM.appendChild(bowDOM);
   //arrow
   const arrowDOM = document.createElement('div');
-  arrowDOM.classList.add('arrow');
+  arrowDOM.classList.add('arrow','arrow-basic');
   arrowDOM.setAttribute("style",`top:${arrowObj.top}px;left:49px`)
   bowDOM.appendChild(arrowDOM);
+  //arrow in board
+  const arrowInBoardDOM = document.createElement('div');
+  arrowInBoardDOM.classList.add('arrow','arrow-in-board');
+  arrowInBoardDOM.setAttribute("style",`opacity:0;top:55px;left:${arrowInBoardObj.left}px`)
+  shootingTargetDOM.appendChild(arrowInBoardDOM);
 
   return gameContainerDOM;
 }
@@ -113,7 +122,8 @@ function initiateMovingTarget(){
     if(shootingTargetObj.left>=window.innerWidth-120||shootingTargetObj.left<=0){
       shootingTargetObj.direction=shootingTargetObj.direction*(-1);
     }
-    shootingTargetObj.left=shootingTargetObj.left+shootingTargetObj.direction;
+    shootingTargetObj.left=shootingTargetObj.left;
+    // shootingTargetObj.left=shootingTargetObj.left+shootingTargetObj.direction;
   }
 }
 
@@ -132,24 +142,24 @@ function addEventListenerToDoc(val){
 }
 
 function moveArrow(e){
-  const arrowDOM = document.getElementsByClassName('arrow');
+  let opacityArrowBasic=1;
+  const arrowDOM = document.getElementsByClassName('arrow-basic');
 console.log(arrowDOM);
   console.log(e);
   if(!arrowObj.canShoot) return null;
   if(e.type==="click"||e.charCode===32||e.charCode===102){
     const id = setInterval(movingArrowFn,4);
-    const arrowDOM = document.getElementsByClassName('arrow');
     arrowObj.canShoot=false;
 
     function movingArrowFn(){
       if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top==55){
-        if(window.innerWidth/2-110 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2+10){
+        if(window.innerWidth/2-120 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2){
+          opacityArrowBasic=0;
           clearInterval(id);
-          // console.log(arrowDOM);
-          updateData(arrowDOM);
+          updateData();
         }
       }
-      arrowDOM[0].setAttribute("style",`top:${arrowObj.top}px;left:49px`)
+      arrowDOM[0].setAttribute("style",`opacity:${opacityArrowBasic};top:${arrowObj.top}px;left:49px`)
       arrowObj.top=arrowObj.top-1;
     }
   }else{
@@ -158,54 +168,32 @@ console.log(arrowDOM);
 
 }
 
-function updateData(arrowDOM){
-  // console.log('arrowDOM',arrowDOM);
-  // console.log('shootingTargetObj.left',shootingTargetObj.left);
-  const bowerLeft =arrowDOM[0].offsetParent.offsetLeft+49;
-  // console.log('bowerLeft',bowerLeft);
-  const placeOnShootingTarget = shootingTargetObj.left-bowerLeft;
-  // console.log('placeOnShootingTarget',placeOnShootingTarget);
-  const ringWidth = 120/9;
-  // console.log("ringWidth",ringWidth);
-  const lowestPoint = 104-bowerLeft;
-  // console.log("lowestPoint",lowestPoint);
+function updateData(){
+  const arrowDOM = document.getElementsByClassName('arrow-basic');
+  const arrowLeftPos =arrowDOM[0].offsetParent.offsetLeft+49;
+  const arrowInBoardDOM = document.getElementsByClassName('arrow-in-board');
+  const placeOnShootingTarget = (-1)*(shootingTargetObj.left-arrowLeftPos);
+  arrowInBoardObj.left=placeOnShootingTarget;
 
 
-  if(placeOnShootingTarget<lowestPoint+ringWidth){
-    gameObj.scoreText= gameObj.scoreText+1;
-    console.log("1111111111");
-  } else if (placeOnShootingTarget<lowestPoint+2*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+3;
-    console.log("2222222222222");
-  } else if (placeOnShootingTarget<lowestPoint+3*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+6;
-    console.log("333333333333");
-  } else if (placeOnShootingTarget<lowestPoint+4*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+8;
-    console.log("444444444444");
-  } else if (placeOnShootingTarget<lowestPoint+5*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+10;
-    console.log("5555555555555");
-  } else if (placeOnShootingTarget<lowestPoint+4*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+8;
-    console.log("44444444444444");
-  } else if (placeOnShootingTarget<lowestPoint+3*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+6;
-    console.log("33333333333333");
-  } else if (placeOnShootingTarget<lowestPoint+2*ringWidth) {
-    gameObj.scoreText= gameObj.scoreText+3;
-    console.log("2222222222222");
-  } else {
-    gameObj.scoreText= gameObj.scoreText+1;
-    console.log("111111111111");
-  }
-  console.log("game",gameObj.scoreText);
-
-  // const gameContainerDOM = document.getElementsByClassName('container');
+  const arr = [97.5,81.5,70.5,57.5,41.5,28.5,17,1,-10];
+  let minusPointOnBoard=0;
+  let breakLoop = false;
+  arr.forEach((item,i)=>{
+    if(breakLoop) return;
+    if(placeOnShootingTarget>=item){
+      breakLoop=true;
+      i>4?minusPointOnBoard=i-4:null;
+      gameObj.scoreText= gameObj.scoreText+2+(2*i)-(4*minusPointOnBoard);
+      // console.log(i);
+      // console.log('gameObj.scoreText',gameObj.scoreText);
+    }
+  })
 
   const scoreTextDOM = document.getElementsByClassName('scoreText');
-  scoreTextDOM.innerHTML='Score: '+gameObj.scoreText;
+  scoreTextDOM[0].innerHTML='Score: '+gameObj.scoreText;
   // gameContainerDOM.appendChild(scoreTextDOM);
+  arrowInBoardDOM[0].setAttribute("style",`opacity:1;top:55px;left:${arrowInBoardObj.left}px`)
 
 
 }

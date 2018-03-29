@@ -59,15 +59,28 @@ body{
 }
 
 .arrow{
+  width: 20px;
   display: block;
   border: 1px solid red;
-  width: 20px;
-  height: 90px;
   position: absolute;
-  background-image: url("./../assets/arrow.png");
-  background-position: center;
+  background-position: top;
   background-repeat: no-repeat;
   background-size: contain;
+}
+
+.arrow-basic{
+  height: 70px;
+  background-image: url("./../assets/arrow.png");
+}
+
+.arrow-in-board{
+  height: 50px;
+  background-image: url("./../assets/arrowInBoard.png");
+}
+
+.arrow-in-board:before{
+  height: 50px;
+  background-image: url("./../assets/arrowInBoard.png");
 }
 
 .scoreText{
