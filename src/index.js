@@ -17,7 +17,7 @@ class Arrow{
 class Game{
   constructor(scoreText){
     this.scoreText=scoreText;
-    this.noOfArrows=1;
+    this.noOfArrows=2;
     this.stopGame=false;
   }
 }
@@ -38,9 +38,10 @@ class Button{
 
 const aroowTopPos = 0;
 const arrowInBoardLeftPos = 0;
+const shootingTargetObjLeft = window.innerWidth/2-60;
 
 const gameObj = new Game(0);
-const shootingTargetObj = new ShootingTarget(window.innerWidth/2-60);
+const shootingTargetObj = new ShootingTarget(shootingTargetObjLeft);
 // console.log(window.innerWidth/2-60);
 const bowObj = new Bow();
 const arrowObj = new Arrow(aroowTopPos);
@@ -101,17 +102,25 @@ function startPlaying(){
   const child = document.getElementsByClassName('main_button');
   const parent = child[0].parentNode;
   parent.removeChild(child[0]);
-  //setting score to 0
-  gameObj.scoreText=0;
-
   //if the gameOverText exist remove it
   const gameOverText =document.getElementsByClassName('gameOverText');
   if(gameOverText.length>0){
     const gameOverTextParent = gameOverText[0].parentNode;
     gameOverTextParent.removeChild(gameOverText[0]);
   };
+
+  backInitSettings()
   initiateMovingTarget();
   addEventListenerToDoc(true);
+}
+
+function backInitSettings(){
+  gameObj.scoreText=0;
+  gameObj.stopGame=false;
+  gameObj.noOfArrows=2;
+  const scoreTextDOM = document.getElementsByClassName('scoreText');
+  scoreTextDOM[0].innerHTML='Score: '+gameObj.scoreText+' Arrows: '+gameObj.noOfArrows;
+  setInitialArrows();
 }
 
 function gameOver(){
@@ -135,9 +144,17 @@ function showGameOverInfo(){
   buttonDOM.setAttribute("style",`top:${buttonObj.top}px;left:${buttonObj.left}px`);
   buttonDOM.addEventListener('click',startPlaying);
   element[0].appendChild(buttonDOM);
+  // gameObj.stopGame=false;
 }
 
-// console.log();
+function setInitialArrows(){
+  const target = document.getElementsByClassName('shooting-target');
+  target[0].childNodes[0].setAttribute("style",`opacity:0;top:55px;left:${arrowInBoardObj.left}px`);
+  arrowObj.top=aroowTopPos;
+  const arrowDOM = document.getElementsByClassName('arrow-basic');
+  arrowDOM[0].setAttribute("style",`opacity:1;top:${arrowObj.top}px;left:49px`);
+  addEventListenerToDoc(true);
+}
 
 function initiateMovingTarget(){
   const id = setInterval(movingTarget,10)
@@ -151,11 +168,7 @@ function initiateMovingTarget(){
     if(shootingTargetObj.left>=marginForBoardRight||shootingTargetObj.left<=marginForBoardLeft){
       shootingTargetObj.direction=shootingTargetObj.direction*(-1);
       if(arrowObj.canArrowBasicDisappear){
-        target[0].childNodes[0].setAttribute("style",`opacity:0;top:55px;left:${arrowInBoardObj.left}px`);
-        arrowObj.top=aroowTopPos;
-        const arrowDOM = document.getElementsByClassName('arrow-basic');
-        arrowDOM[0].setAttribute("style",`opacity:1;top:${arrowObj.top}px;left:49px`);
-        addEventListenerToDoc(true)
+        setInitialArrows()
       }
     }
     shootingTargetObj.left=shootingTargetObj.left+shootingTargetObj.direction;
