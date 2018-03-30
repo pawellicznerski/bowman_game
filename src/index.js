@@ -11,7 +11,6 @@ class Arrow{
   constructor(top){
     this.top=top;
     this.canArrowBasicDisappear=false;
-    thi.h=0;
   }
 }
 
