@@ -12,7 +12,7 @@ body{
 }
 
 .container{
-  background-color: yellow;
+  /*background-color: yellow;*/
   position: relative;
   height: 100%;
   width: 100%;
