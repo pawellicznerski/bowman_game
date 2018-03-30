@@ -201,11 +201,12 @@ function moveArrow(e){
     function movingArrowFn(){
       if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top==55){
         if(window.innerWidth/2-120 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2){
-          gameObj.noOfArrows==0?gameOver():null;
           opacityArrowBasic=0;
           clearInterval(id);
           arrowObj.canArrowBasicDisappear=true;
           updateData(arrowDOM);
+          gameObj.noOfArrows==0?gameOver():null;
+
         }
       }else if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top<-70){
         gameObj.noOfArrows==0?gameOver():null;
