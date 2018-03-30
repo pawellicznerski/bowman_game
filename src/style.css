@@ -26,22 +26,27 @@ body{
   height: 50px;
 }
 
+.gameOverText{
+ font-size: 20px;
+}
+
 .shooting-target{
   width: 120px;
   height:120px;
-  border: 1px solid blue;
+  /*border: 1px solid blue;*/
   position: absolute;
   background-image: url("./../assets/shootingTarget.png");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 100% 80%;
 }
+
 
 .bow{
   width: 120px;
   height:120px;
   position: relative;
-  border: 1px solid blue;
+  /*border: 1px solid blue;*/
 
 }
 .bow:before {
@@ -61,7 +66,7 @@ body{
 .arrow{
   width: 20px;
   display: block;
-  border: 1px solid red;
+  /*border: 1px solid red;*/
   position: absolute;
   background-position: top;
   background-repeat: no-repeat;

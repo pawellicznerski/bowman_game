@@ -10,13 +10,15 @@ class Bow{
 class Arrow{
   constructor(top){
     this.top=top;
-    this.canShoot=false;
+    this.canArrowBasicDisappear=false;
   }
 }
 
 class Game{
   constructor(scoreText){
     this.scoreText=scoreText;
+    this.noOfArrows=1;
+    this.stopGame=false;
   }
 }
 
@@ -39,7 +41,7 @@ const arrowInBoardLeftPos = 0;
 
 const gameObj = new Game(0);
 const shootingTargetObj = new ShootingTarget(window.innerWidth/2-60);
-console.log(window.innerWidth/2-60);
+// console.log(window.innerWidth/2-60);
 const bowObj = new Bow();
 const arrowObj = new Arrow(aroowTopPos);
 const arrowInBoardObj = new Arrow();
@@ -60,7 +62,7 @@ function component() {
   //score table
   const scoreTextDOM = document.createElement('div');
   scoreTextDOM.classList.add('scoreText');
-  scoreTextDOM.innerHTML='Score: '+gameObj.scoreText;
+  scoreTextDOM.innerHTML='Score: '+gameObj.scoreText+' Arrows: '+gameObj.noOfArrows;
   gameContainerDOM.appendChild(scoreTextDOM);
   //shooting target
   const shootingTargetDOM = document.createElement('div');
@@ -110,28 +112,50 @@ function startPlaying(){
   };
   initiateMovingTarget();
   addEventListenerToDoc(true);
+}
+
+function gameOver(){
+  gameObj.stopGame=true;
+  showGameOverInfo()
 
 }
+
+function showGameOverInfo(){
+  //creating game over info and adding it to the main el
+  const element = document.getElementsByClassName('container');
+  const gameOverText = document.createElement('p');
+  // gameOverText.setAttribute("style",`top:${window.innerHeight/2-120}px;left:${window.innerWidth/2-100}px`);
+  gameOverText.classList.add('gameOverText');
+  gameOverText.innerText=`Game over. Your score is ${gameObj.scoreText}`;
+  element[0].appendChild(gameOverText);
+
+  const buttonDOM = document.createElement('button');
+  buttonDOM.classList.add('main_button');
+  buttonDOM.innerHTML='PLAY A NEW GAME';
+  buttonDOM.setAttribute("style",`top:${buttonObj.top}px;left:${buttonObj.left}px`);
+  buttonDOM.addEventListener('click',startPlaying);
+  element[0].appendChild(buttonDOM);
+}
+
+// console.log();
 
 function initiateMovingTarget(){
   const id = setInterval(movingTarget,10)
 
   function movingTarget(){
+    gameObj.stopGame==true?clearInterval(id):null;
     const target = document.getElementsByClassName('shooting-target');
     target[0].setAttribute("style",`top:0px;left:${shootingTargetObj.left}px`);
-    if(shootingTargetObj.left>=window.innerWidth-120||shootingTargetObj.left<=0){
+    const marginForBoardLeft = window.innerWidth<550?0: window.innerWidth/2-240;
+    const marginForBoardRight = window.innerWidth<550?window.innerWidth-120:window.innerWidth/2+120;
+    if(shootingTargetObj.left>=marginForBoardRight||shootingTargetObj.left<=marginForBoardLeft){
       shootingTargetObj.direction=shootingTargetObj.direction*(-1);
-      target[0].childNodes[0].setAttribute("style",`opacity:0;top:55px;left:${arrowInBoardObj.left}px`);
-      arrowObj.top=aroowTopPos;
-      const arrowDOM = document.getElementsByClassName('arrow-basic');
-      arrowDOM[0].setAttribute("style",`opacity:1;top:${arrowObj.top}px;left:49px`);
-      addEventListenerToDoc(true)
-
-
-      if(Math.abs(arrowObj.top)>=arrowDOM[0].offsetParent.offsetTop+70){
-        console.log('arrowDOM',arrowDOM);
-        console.log(arrowObj.top);
-        console.log(arrowDOM[0].offsetParent.offsetTop);
+      if(arrowObj.canArrowBasicDisappear){
+        target[0].childNodes[0].setAttribute("style",`opacity:0;top:55px;left:${arrowInBoardObj.left}px`);
+        arrowObj.top=aroowTopPos;
+        const arrowDOM = document.getElementsByClassName('arrow-basic');
+        arrowDOM[0].setAttribute("style",`opacity:1;top:${arrowObj.top}px;left:49px`);
+        addEventListenerToDoc(true)
       }
     }
     shootingTargetObj.left=shootingTargetObj.left+shootingTargetObj.direction;
@@ -140,7 +164,7 @@ function initiateMovingTarget(){
 
 function addEventListenerToDoc(val){
   if(val){
-    arrowObj.canShoot=true;
+    // arrowObj.canArrowBasicDisappear=true;
     setTimeout(function(){
       ['click','keypress'].forEach( evt =>
       document.body.addEventListener(evt, moveArrow)
@@ -153,24 +177,33 @@ function addEventListenerToDoc(val){
 }
 
 function moveArrow(e){
-  addEventListenerToDoc(false)
+  addEventListenerToDoc(false);
   let opacityArrowBasic=1;
   const arrowDOM = document.getElementsByClassName('arrow-basic');
-  if(!arrowObj.canShoot) return null;
+  arrowObj.canArrowBasicDisappear=false;
+  // if(!arrowObj.canArrowBasicDisappear) return null;
   if(e.type==="click"||e.charCode===32||e.charCode===102){
+    gameObj.noOfArrows=gameObj.noOfArrows-1;
     const id = setInterval(movingArrowFn,4);
-    arrowObj.canShoot=false;
     function movingArrowFn(){
       if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top==55){
         if(window.innerWidth/2-120 < shootingTargetObj.left && shootingTargetObj.left < window.innerWidth/2){
+          gameObj.noOfArrows==0?gameOver():null;
           opacityArrowBasic=0;
           clearInterval(id);
+          arrowObj.canArrowBasicDisappear=true;
           updateData(arrowDOM);
         }
+      }else if(arrowDOM[0].offsetParent.offsetTop+arrowObj.top<-70){
+        gameObj.noOfArrows==0?gameOver():null;
+        clearInterval(id);
+        arrowObj.canArrowBasicDisappear=true;
       }
+
       arrowDOM[0].setAttribute("style",`opacity:${opacityArrowBasic};top:${arrowObj.top}px;left:49px`)
       arrowObj.top=arrowObj.top-1;
-      console.log(arrowObj.top);
+      const scoreTextDOM = document.getElementsByClassName('scoreText');
+      scoreTextDOM[0].innerHTML='Score: '+gameObj.scoreText+' Arrows: '+gameObj.noOfArrows;
     }
   }else{
     return null;
@@ -192,11 +225,12 @@ function updateData(arrowDOM){
       breakLoop=true;
       i>4?minusPointOnBoard=i-4:null;
       gameObj.scoreText= gameObj.scoreText+2+(2*i)-(4*minusPointOnBoard);
+      console.log("points:",2+(2*i)-(4*minusPointOnBoard));
     }
   })
 
   const scoreTextDOM = document.getElementsByClassName('scoreText');
-  scoreTextDOM[0].innerHTML='Score: '+gameObj.scoreText;
+  scoreTextDOM[0].innerHTML='Score: '+gameObj.scoreText+' Arrows: '+gameObj.noOfArrows;
   const arrowInBoardDOM = document.getElementsByClassName('arrow-in-board');
   arrowInBoardDOM[0].setAttribute("style",`opacity:1;top:55px;left:${arrowInBoardObj.left}px`)
 }
